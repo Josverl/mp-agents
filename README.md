@@ -8,30 +8,35 @@ This community marketplace focuses on developing with MicroPython and working
 with MicroPython devices. It is independent of the MicroPython project and is
 not limited to one AI provider.
 
-**Status:** initial release. The package targets GitHub Copilot (CLI, VS Code,
-and the Copilot app), Claude Code, and Claude's plugin interfaces. Other clients
-that support the included formats are welcome. See [Compatibility](#compatibility)
-for the distinction between format support and tested integrations.
+The marketplace and plugins targets:
+- GitHub Copilot (CLI, VS Code,and the Copilot app), 
+- Claude Code, and Claude's plugin interfaces. 
+
+Other clients that support the included formats are welcome.
+
+
+
+
 
 ## What's included
 
 | Plugin | What it does |
 | --- | --- |
-| [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, work with ROMFS, inspect trees, and manage selected files. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
+| [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, work with ROMFS. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
+
 
 ## Background
 
 MicroPython workflows span different boards, operating systems, development
 environments, and agent clients. This marketplace packages reusable instructions
-without hard-coding a user's device, requiring a project-specific skill, or
-building a copy of `mpremote`.
+without hard-coding a user's device, or requiring multiple copies of project-specific skills.
 
-## Requirements
+## Generic Requirements
 
 - A client with plugin/marketplace support, with that feature enabled.
 - An execution environment that can access the board's serial port.
 - An installed `mpremote`, or `uvx` from [uv](https://docs.astral.sh/uv/) so the
-  skill can use `uvx mpremote`. The plugin does not install or build `mpremote`.
+  skill can use `uvx mpremote`.
 - For Windows USB devices used in WSL2:
   [usbipd-win](https://github.com/dorssel/usbipd-win).
 
@@ -39,11 +44,22 @@ Installing instructions does not grant USB access, install drivers, or bypass
 permissions. A cloud chat or sandbox cannot automatically access a board plugged
 into your computer.
 
-## Use the marketplace
 
-Review the [skill](plugins/mpremote/skills/mpremote/SKILL.md) before installing.
-This plugin supplies instructions only: no bundled MCP server, hook, or installer.
-The agent still needs approval for operations that require it.
+# Use the marketplace
+
+Before installing any plugin, review its documentation and understand the operations it performs. The marketplace only provides instructions; it does not include bundled installers or automatic hardware access.
+
+| Client | Add marketplace | Install plugin |
+| --- | --- | --- |
+| GitHub Copilot CLI | `copilot plugin marketplace add josverl/mp-agents` ([details](#github-copilot-cli)) | `copilot plugin install mpremote@mp-agents` ([details](#github-copilot-cli)) |
+| VS Code with GitHub Copilot | Add `josverl/mp-agents` in Customizations ([details](#vs-code-with-github-copilot)) | [Install the mpremote agent plugin in VS Code](https://vscode.dev/redirect?url=vscode%3A%2F%2Fchat-plugin%2Finstall%3Fsource%3Djosverl%252Fmp-agents%26plugin%3Dmpremote) ([details](#vs-code-with-github-copilot)) |
+| GitHub Copilot app | **Customize > Installed > Add plugin > Manage marketplaces…** ([details](#github-copilot-app)) | **Add plugin > Browse plugins**, then install `mpremote` ([details](#github-copilot-app)) |
+| Claude Code | `claude plugin marketplace add josverl/mp-agents` ([details](#claude-code)) | `claude plugin install mpremote@mp-agents` ([details](#claude-code)) |
+| Claude web/desktop and Cowork | Add `josverl/mp-agents` in Customize ([details](#claude-webdesktop-and-cowork)) | Find and install `mpremote` in Customize ([details](#claude-webdesktop-and-cowork)) |
+
+
+The GitHub CLI example installs the skill directly, not the plugin. GUI entries
+show values to enter or actions to select; they are not shell commands.
 
 ### GitHub Copilot CLI
 
@@ -66,14 +82,40 @@ it at user scope for use across projects.
 
 Supported VS Code versions can also use this
 [install link](https://vscode.dev/redirect?url=vscode%3A%2F%2Fchat-plugin%2Finstall%3Fsource%3Djosverl%252Fmp-agents%26plugin%3Dmpremote).
-It asks for confirmation; it is not a silent installer. VS Code also discovers
-plugins installed by Copilot CLI in the same user's environment.
+It asks for confirmation and installs the agent plugin, not the `mpremote` Python
+tool. VS Code also discovers plugins installed by Copilot CLI in the same user's
+environment.
 
 ### GitHub Copilot app
 
-Open **Customize**, use the marketplace settings control to add
-`https://github.com/josverl/mp-agents`, then find and install `mpremote`.
-Use a session that executes on a machine with access to the board.
+To add the marketplace in the app:
+
+1. Open **Customize** and select **Installed**.
+2. Open the **Add plugin** dropdown and select **Manage marketplaces…**.
+3. Add `josverl/mp-agents` as the marketplace.
+4. Return to **Installed**, open **Add plugin**, and select **Browse plugins**.
+5. Find `mpremote` and install it.
+
+The menu labels above match the Copilot app UI. If the marketplace dialog differs
+in your app version, consult
+[GitHub's Copilot app instructions](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app#adding-a-plugin-marketplace).
+
+Alternatively, open **PowerShell** on the same machine and use Copilot CLI to
+add the marketplace and install the plugin (these are terminal commands, not
+chat messages):
+
+```powershell
+copilot plugin marketplace add josverl/mp-agents
+copilot plugin install mpremote@mp-agents
+copilot plugin list
+```
+
+Look for `mpremote@mp-agents` in the output, then start a new app session and
+check **Customize > Installed**. The CLI installation has been tested; app
+discovery of that installation has not been verified. GitHub documents that
+CLI-configured skills are available in the Copilot app, but plugin display and
+refresh behavior can vary. An existing personal `mpremote` skill may appear
+even without the plugin and can take precedence over the plugin's copy.
 
 ### Claude Code
 
