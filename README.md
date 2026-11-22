@@ -24,6 +24,7 @@ Other clients that support the included formats are welcome.
 | --- | --- |
 | [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, work with ROMFS. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
 | [mpflash](plugins/mpflash/README.md) | Identify boards, download firmware, and flash MicroPython using UF2, esptool, STM32 DFU, optional pyOCD, or PSOC Edge OpenOCD. Includes Windows, Linux, macOS, WSL2, and container guidance with explicit device approval. |
+| [mpbuild](plugins/mpbuild/README.md) | Build custom MicroPython firmware in containers without separate host compiler toolchains. Supports Linux, macOS, and WSL2 with native Linux storage; hands produced images to mpflash for approved flashing. |
 
 
 ## Background
@@ -35,13 +36,16 @@ without hard-coding a user's device, or requiring multiple copies of project-spe
 ## Generic Requirements
 
 - A client with plugin/marketplace support, with that feature enabled.
-- An execution environment that can access the board's required serial port,
+- For device operations, an execution environment that can access the board's required serial port,
   USB device, debug probe, or UF2 boot volume.
-- The selected plugin's Python tool (`mpremote` or `mpflash`), or `uvx` from
+- The selected plugin's Python tool (`mpremote`, `mpflash`, or `mpbuild`), or `uvx` from
   [uv](https://docs.astral.sh/uv/) to run it in an isolated environment.
 - Backend-specific drivers and permissions described in the plugin README.
 - For Windows USB devices used in WSL2:
   [usbipd-win](https://github.com/dorssel/usbipd-win).
+- For mpbuild, a MicroPython checkout on Linux, macOS, or WSL2 and a working
+  Docker-compatible Linux container runtime. WSL builds must use the distro's
+  own storage, not Windows-mounted paths. Building alone needs no board access.
 
 Installing instructions does not grant USB access, install drivers, or bypass
 permissions. A cloud chat or sandbox cannot automatically access a board plugged
@@ -68,6 +72,8 @@ The examples below install `mpremote`. To install the firmware-flashing plugin,
 use `mpflash@mp-agents` instead (or select `mpflash` in the GUI). See the
 [mpflash README](plugins/mpflash/README.md) for its installation link,
 requirements, and safety limits.
+For container-based custom builds, use `mpbuild@mp-agents` (or select `mpbuild`
+in the GUI); see the [mpbuild README](plugins/mpbuild/README.md).
 
 ### GitHub Copilot CLI
 
@@ -112,6 +118,7 @@ window. Install and authenticate Copilot CLI there if needed, then run:
 copilot plugin marketplace add josverl/mp-agents
 copilot plugin install mpremote@mp-agents
 copilot plugin install mpflash@mp-agents
+copilot plugin install mpbuild@mp-agents
 copilot plugin list
 ```
 
@@ -240,6 +247,20 @@ post-flash board identification and independent REPL verification. See the
 [mpflash validation results](plugins/mpflash/README.md#windows-hardware-validation)
 for exact commands and limitations. Client activation and other platforms and
 flashing backends remain untested for that plugin.
+
+The [mpbuild workflow](plugins/mpbuild/README.md#validation) built a custom
+Pico 2 W UF2 in Docker from a native-storage WSL2 checkout, without installing
+host compiler toolchains. WSL flashing copied the image but mpflash reported
+a post-copy reconnect failure; after a scoped serial-permission correction,
+independent verification confirmed the preview firmware, its frozen marker,
+and standard networking imports. See that plugin's validation notes for exact
+results, including the failed CLI status. Client activation and other build
+platforms remain untested.
+The generalized workflow also passed an
+[ESP32-C6 build and flash test](plugins/mpbuild/README.md#esp32-c6-and-persistent-permission-validation).
+Its optional permission helper batches persistent udev setup and approved WSL
+serial-group enrollment into one administrative invocation. Reconnect and
+flashing tests then ran without sudo; five focused safety tests run in Linux CI.
 
 ## Add a plugin
 

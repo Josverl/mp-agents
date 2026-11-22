@@ -22,6 +22,14 @@ duplicating shared skill content or excluding otherwise compatible tools.
    node scripts/validate.mjs
    ```
 
+For changes to the mpbuild serial-permission helper, also run on Linux:
+
+```sh
+python3 -B -m unittest discover -s scripts -p 'test_mpbuild_permissions.py' -v
+```
+
+These tests do not access devices or install rules.
+
 The sync command updates `.github/plugin/marketplace.json` and
 `.claude-plugin/marketplace.json` from the root catalog. Commit all three.
 Do not maintain different plugin lists per client.

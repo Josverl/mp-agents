@@ -20,3 +20,5 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/validate.mjs
+      - if: runner.os == 'Linux'
+        run: python3 -B -m unittest discover -s scripts -p 'test_mpbuild_permissions.py' -v
