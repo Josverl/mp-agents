@@ -56,6 +56,8 @@ review and install `mpflash`. Supported versions can use this
 [install link](https://vscode.dev/redirect?url=vscode%3A%2F%2Fchat-plugin%2Finstall%3Fsource%3Djosverl%252Fmp-agents%26plugin%3Dmpflash).
 Other supported marketplace UIs can select `mpflash` from the same catalog.
 Installing the plugin does not install the Python tool or drivers.
+If VS Code in WSL reports that the selected agent does not support plugin
+installation, use the [Copilot CLI WSL workaround](../../README.md#work-around-plugin-installation-errors-in-wsl).
 
 ## Use and update
 

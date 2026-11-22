@@ -94,6 +94,41 @@ It asks for confirmation and installs the agent plugin, not the `mpremote` Pytho
 tool. VS Code also discovers plugins installed by Copilot CLI in the same user's
 environment.
 
+#### Work around plugin installation errors in WSL
+
+In a WSL window, the Customizations marketplace can show an **Install** button
+but fail with “The selected agent does not support plugin installation.” This
+exact error [has been reported for Copilot plugin installation in VS Code remote
+windows](https://github.com/microsoft/vscode/issues/342690), including WSL; it
+does not by itself indicate a problem with the plugin package. A workaround is
+to install with Copilot CLI **inside the Ubuntu/WSL environment**; a CLI
+installation in Windows installs to a different home and may not be available
+to the WSL session.
+
+Open the integrated terminal connected to the same WSL distro as the VS Code
+window. Install and authenticate Copilot CLI there if needed, then run:
+
+```sh
+copilot plugin marketplace add josverl/mp-agents
+copilot plugin install mpremote@mp-agents
+copilot plugin install mpflash@mp-agents
+copilot plugin list
+```
+
+VS Code [discovers Copilot CLI plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins#_plugins-installed-by-github-copilot-cli)
+from that environment's `~/.copilot/installed-plugins/`. Start a new chat and
+check **Plugins** in Customizations. Select the **Copilot** harness as the
+chat's Session Target; the install error can still occur in WSL even when
+Copilot is selected.
+
+As another UI workaround, some VS Code versions allow the marketplace's
+**Plugins** page to install plugins when the unified marketplace **Browse**
+install fails: set `chat.customizations.marketplace.enabled` to `false`,
+reload the window, then open **Customizations > Plugins > Browse Marketplace**
+and install from there. This is a reported VS Code workaround and may depend on
+the VS Code version and active harness. If it is unavailable or still fails,
+use Copilot CLI in WSL.
+
 ### GitHub Copilot app
 
 To add the marketplace in the app:

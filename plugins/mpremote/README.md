@@ -28,6 +28,9 @@ copilot plugin marketplace add josverl/mp-agents
 copilot plugin install mpremote@mp-agents
 ```
 
+If VS Code in WSL reports that the selected agent does not support plugin
+installation, use the [Copilot CLI WSL workaround](../../README.md#work-around-plugin-installation-errors-in-wsl).
+
 ```sh
 claude plugin marketplace add josverl/mp-agents
 claude plugin install mpremote@mp-agents
