@@ -1,0 +1,17 @@
+{
+  "name": "mp-agents",
+  "owner": {
+    "name": "Josverl"
+  },
+  "metadata": {
+    "description": "Portable agent plugins for working with MicroPython."
+  },
+  "plugins": [
+    {
+      "name": "mpremote",
+      "source": "./plugins/mpremote",
+      "version": "0.1.0",
+      "description": "Work with attached MicroPython boards using mpremote on Windows, Linux, WSL2, and Docker."
+    }
+  ]
+}

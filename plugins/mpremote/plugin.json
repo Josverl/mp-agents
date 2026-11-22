@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "mpremote",
+  "version": "0.1.0",
+  "description": "Work with attached MicroPython boards using mpremote on Windows, Linux, WSL2, and Docker.",
+  "author": {
+    "name": "Josverl"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/josverl/mp-agents",
+  "keywords": ["micropython", "mpremote", "usb", "serial", "wsl", "embedded"]
+}
