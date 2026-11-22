@@ -1,6 +1,6 @@
 ---
 name: mpremote
-description: Use mpremote to work with attached MicroPython boards over serial on Windows, Linux, WSL2, or Docker. Use for finding boards, forwarding USB with usbipd-win, running MicroPython scripts, copying or removing files and directories, listing device trees, installing packages with mip, or running code from a mounted workspace folder.
+description: Use mpremote to work with attached MicroPython boards over serial on Windows, Linux, WSL2, or Docker. Use for finding boards, forwarding USB with usbipd-win, running MicroPython scripts, copying or removing files and directories, listing device trees, installing packages with mip, mounting a workspace, or building, inspecting, and deploying ROMFS images.
 ---
 
 # Work with MicroPython boards using mpremote
@@ -27,7 +27,7 @@ mpremote connect COM7 fs cp :/demo/demo.py "demo-from-board.py"
 mpremote connect COM7 fs ls :/demo
 ```
 
-Use `fs --recursive cp` for directory copies. If `mpremote fs --help` does not list `tree`, or the tree command does not produce a listing, use `fs ls` to walk the requested directories. Confirm successful transfers by listing the destination on the relevant side; compare content when accuracy matters.
+Use `fs --recursive cp` for directory copies. For uploads, create the destination parent on the device first and copy the local directory into that existing parent, for example `mpremote connect COM7 fs --recursive cp "./app" :/demo` creates `/demo/app`. Some mpremote versions fail when copying a flat source directory to a non-existent destination. If `mpremote fs --help` does not list `tree`, or the tree command does not produce a listing, use `fs ls` to walk the requested directories. Confirm successful transfers by listing the destination on the relevant side; compare content when accuracy matters.
 
 Delete only a named path the user intends to remove. Use `rmdir` for empty directories. Before recursive deletion, list the exact subtree and confirm its contents and scope; never remove a filesystem root, the current working directory, or an entire mount. These are separate examples, not a sequence:
 
@@ -47,7 +47,8 @@ mpremote connect COM7 mount "./app" exec "exec(open('/remote/demo.py').read(), {
 ```
 
 - `run` reads a script on the machine running `mpremote`, sends it for execution on the board, and does not install the script. `exec` runs code on the board; in the second example it reads a file already stored there.
-- `mount` exposes the local folder at `/remote` and makes it the board's working directory for that session. Keep `mount` and the action in the same invocation. `mount ... run ...` still takes a *local* script path relative to the terminal's current directory. The last example instead opens the script via the board's mounted filesystem.
+- For the two mount examples, the terminal's working directory is the parent of the local `app` folder. `mount "./app"` exposes that folder on the board as `/remote` and sets the board's working directory to `/remote`. Thus the host file `./app/demo.py` appears to the board as `/remote/demo.py`.
+- Keep `mount` and the action in the same invocation. `run "./app/demo.py"` reads the **host** path relative to the terminal's working directory, then sends its contents to the board; it does not open `/remote/demo.py`. The `exec` example instead opens the **device** path `/remote/demo.py` through the mounted filesystem. Do not pass `/remote/demo.py` to `run` unless that is also a real path on the host.
 - Mount only the intended project subdirectory. Code on the board can write to the mounted host directory if host permissions allow. Do not use `--unsafe-links`. The mount ends when `mpremote` exits normally; `mount` without an action opens an interactive REPL by default. Use finite scripts for unattended execution, capture output, and report exceptions or timeouts rather than assuming success.
 
 ## Install MicroPython packages
@@ -61,6 +62,28 @@ mpremote connect COM7 mip --target /flash/lib install aioble
 Install only requested packages from trusted sources. The terminal running `mpremote` downloads the package and transfers it to the board; the board does not need internet access. Normally let `mip` find the board's library directory. Use `--target` only when the intended device path is known; use `--no-mpy` to request source files when `.mpy` compatibility is a concern. Verify the install with a scoped device listing or, if running an import is appropriate, `mpremote connect COM7 exec "import aioble; print('import OK')"`.
 
 When chaining commands after a variable-length `fs` or `mip` command, use `+` to end its arguments, for example `mpremote connect COM7 fs ls :/ + run "./app/demo.py"`.
+
+## Work with ROMFS
+
+ROMFS is a read-only filesystem stored in a device ROM partition, not the writable device filesystem or the temporary host mount at `/remote`. On supported firmware the first valid ROMFS partition is normally mounted at `/rom` at boot, with `/rom` and `/rom/lib` added to `sys.path`. Supported memory-mapped `.mpy` files can execute directly from flash. ROMFS support and partition configuration vary by board and firmware.
+
+1. Check `mpremote romfs --help` first; if the installed client lacks `romfs`, report that a version supporting it is needed. Do not build mpremote. For an identified board, `mpremote connect COM7 resume romfs query` lists partition indices, sizes, and the first bytes. It can interrupt running code. A report that ROMFS is disabled or no partitions are available means **stop**; do not infer support from the board model or automatically reflash firmware, repartition, or format anything. Some clients report these conditions with exit status zero, so inspect the output, not just the exit code. The header check is not a full integrity check.
+2. Build an image on the host without connecting to a board:
+
+   ```text
+   mpremote romfs --no-mpy --output "./myapp.romfs" build "./myapp"
+   ```
+
+   Choose an output path outside the source directory and check it does not overwrite an existing file. `--no-mpy` leaves source `.py` files uncompiled. Without it, mpremote attempts compilation using the **`mpy_cross` Python package in mpremote's own environment**; if unavailable it warns and retains `.py` files. If bytecode is required, verify the output and use an `mpy_cross` version compatible with the target firmware and native architecture; do not silently install or build tools. Existing `.mpy` files also require compatibility.
+3. Before deployment, confirm the board, partition index, image contents and size against `romfs query`, and whether existing ROMFS content needs backing up. Deployment erases/replaces data in the selected partition and may unmount `/rom`; it is not an ordinary file copy. Obtain explicit approval for that overwrite and any reset, and do not deploy if the partition is unknown, the image is too large, or required data cannot be recovered.
+
+   ```text
+   mpremote connect COM7 resume romfs --partition 0 deploy "./myapp.romfs"
+   ```
+
+   The source can instead be a host directory, built during deployment. Partition `0` is the default; do not assume another partition mounts at `/rom`. After an approved soft reset or reboot, query again and inspect `/rom` with `fs --human tree :/rom` or `fs ls :/rom`. Confirm expected files and `sys.path`; only import modules when executing them is appropriate. A query's valid header alone does not prove that the correct contents were deployed. Report errors and unexpected results.
+
+[MicroPython ROMFS reference](https://docs.micropython.org/en/latest/reference/romfs.html)
 
 ## Forward a Windows USB board to WSL2
 

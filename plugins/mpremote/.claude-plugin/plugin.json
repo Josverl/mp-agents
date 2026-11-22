@@ -1,6 +1,6 @@
 {
   "name": "mpremote",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Work with attached MicroPython boards using mpremote on Windows, Linux, WSL2, and Docker.",
   "author": {
     "name": "Josverl"

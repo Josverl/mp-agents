@@ -11,6 +11,8 @@ fallback; it never builds `mpremote` from source.
 - Run host scripts or scripts already on the board.
 - Run scripts with a local folder mounted as `/remote`.
 - Install requested packages with `mpremote mip install`.
+- Inspect ROMFS partitions, build host images, and deploy to a confirmed ROMFS
+  partition with explicit approval.
 - List files and directory trees; remove only explicitly scoped files/folders.
 - List, bind, attach, detach, and unbind a selected Windows USB board with
   `usbipd-win` for WSL2 use.
@@ -43,8 +45,9 @@ Start a new session in an environment that can see the board and your scripts:
 
 Read the full [skill](skills/mpremote/SKILL.md) for command syntax and precautions.
 Commands can interrupt the running application. File deletion is irreversible,
-and code using a host mount may modify host files. Never select a board, reset it,
-or remove a directory based on guesswork.
+and code using a host mount may modify host files. ROMFS deployment replaces
+partition contents. Never select a board, reset it, deploy ROMFS, or remove a
+directory based on guesswork.
 
 ## Package and validation
 

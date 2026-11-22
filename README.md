@@ -17,7 +17,7 @@ for the distinction between format support and tested integrations.
 
 | Plugin | What it does |
 | --- | --- |
-| [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, inspect trees, and manage selected files. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
+| [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, work with ROMFS, inspect trees, and manage selected files. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
 
 ## Background
 
@@ -141,8 +141,12 @@ settings can distribute approved marketplaces. Always review new versions.
 | Claude web/desktop / Cowork | Claude marketplace format | Account installation and device-access capabilities depend on the client; smoke test needed. |
 | Other compatible clients | Standard skill and portable plugin manifest | Not excluded; not yet integration-tested. |
 
-Hardware workflows on Linux, WSL2, and Docker still require validation on your
-devices. The marketplace's checks do not open serial ports or change USB ownership.
+Hardware tests on a Raspberry Pi Pico 2 W and ESP32-C6 verified Windows file
+round-trips, script execution, mounts, `mip`, directory trees, and scoped
+deletion. The Pico also ran mounted scripts in Ubuntu WSL2 and a non-root
+Docker Desktop Linux container using `uvx mpremote`. Other boards and Linux
+installations may behave differently. The automated marketplace checks do not
+open serial ports or change USB ownership.
 
 ## Add a plugin
 
