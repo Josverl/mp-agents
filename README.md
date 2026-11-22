@@ -135,9 +135,9 @@ settings can distribute approved marketplaces. Always review new versions.
 
 | Interface | Package support | Validation |
 | --- | --- | --- |
-| GitHub Copilot CLI | Root catalog and Agent Plugins manifest; legacy Claude manifest also provided | Local marketplace registration and installation passed in isolated configuration; one skill discovered. |
+| GitHub Copilot CLI | Root catalog and Agent Plugins manifest; legacy Claude manifest also provided | Local and published GitHub marketplace registration and installation passed in isolated configuration; one skill discovered. |
 | VS Code / GitHub Copilot app | Copilot catalog alias and portable plugin layout | Documented supported format; GUI discovery and activation need a client smoke test. |
-| Claude Code | `.claude-plugin` catalog and plugin manifest; shared `skills/` directory | Claude validation, local registration, and user-scope installation passed in isolated configuration; one skill discovered. |
+| Claude Code | `.claude-plugin` catalog and plugin manifest; shared `skills/` directory | Claude validation, local and GitHub registration, and user-scope installation passed in isolated configuration; one skill discovered. |
 | Claude web/desktop / Cowork | Claude marketplace format | Account installation and device-access capabilities depend on the client; smoke test needed. |
 | Other compatible clients | Standard skill and portable plugin manifest | Not excluded; not yet integration-tested. |
 
@@ -180,6 +180,11 @@ Initial local checks:
   reported one skill, with no agents, hooks, MCP servers, or LSP servers.
 
 These paths record the initial Windows checks, not installation prerequisites.
+Both clients also passed registration and installation from the published
+`josverl/mp-agents` GitHub repository using the commands in
+[Use the marketplace](#use-the-marketplace). The first
+[validation run](https://github.com/josverl/mp-agents/actions/runs/45046542898)
+passed on both Windows and Linux.
 No model-driven skill execution, GUI activation, or hardware changes were tested.
 
 ## License
