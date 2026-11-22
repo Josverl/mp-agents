@@ -23,6 +23,7 @@ Other clients that support the included formats are welcome.
 | Plugin | What it does |
 | --- | --- |
 | [mpremote](plugins/mpremote/README.md) | Find boards, transfer files, run scripts, mount local code, install MicroPython packages, work with ROMFS. Includes Windows-to-WSL USB forwarding and Linux container guidance. |
+| [mpflash](plugins/mpflash/README.md) | Identify boards, download firmware, and flash MicroPython using UF2, esptool, STM32 DFU, optional pyOCD, or PSOC Edge OpenOCD. Includes Windows, Linux, macOS, WSL2, and container guidance with explicit device approval. |
 
 
 ## Background
@@ -34,9 +35,11 @@ without hard-coding a user's device, or requiring multiple copies of project-spe
 ## Generic Requirements
 
 - A client with plugin/marketplace support, with that feature enabled.
-- An execution environment that can access the board's serial port.
-- An installed `mpremote`, or `uvx` from [uv](https://docs.astral.sh/uv/) so the
-  skill can use `uvx mpremote`.
+- An execution environment that can access the board's required serial port,
+  USB device, debug probe, or UF2 boot volume.
+- The selected plugin's Python tool (`mpremote` or `mpflash`), or `uvx` from
+  [uv](https://docs.astral.sh/uv/) to run it in an isolated environment.
+- Backend-specific drivers and permissions described in the plugin README.
 - For Windows USB devices used in WSL2:
   [usbipd-win](https://github.com/dorssel/usbipd-win).
 
@@ -60,6 +63,11 @@ Before installing any plugin, review its documentation and understand the operat
 
 The GitHub CLI example installs the skill directly, not the plugin. GUI entries
 show values to enter or actions to select; they are not shell commands.
+
+The examples below install `mpremote`. To install the firmware-flashing plugin,
+use `mpflash@mp-agents` instead (or select `mpflash` in the GUI). See the
+[mpflash README](plugins/mpflash/README.md) for its installation link,
+requirements, and safety limits.
 
 ### GitHub Copilot CLI
 
@@ -190,6 +198,14 @@ Docker Desktop Linux container using `uvx mpremote`. Other boards and Linux
 installations may behave differently. The automated marketplace checks do not
 open serial ports or change USB ownership.
 
+The client installation and hardware results above apply to `mpremote`, not
+`mpflash`. Separate Windows tests of the `mpflash` skill passed stable firmware
+reinstallation on a Pico 2 W using UF2 and an ESP32-C6 using esptool, with
+post-flash board identification and independent REPL verification. See the
+[mpflash validation results](plugins/mpflash/README.md#windows-hardware-validation)
+for exact commands and limitations. Client activation and other platforms and
+flashing backends remain untested for that plugin.
+
 ## Add a plugin
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Keep the focus on MicroPython and make
@@ -246,7 +262,7 @@ not included.
 Maintained by [@Josverl](https://github.com/josverl). Contributions from the
 MicroPython community are welcome. Use
 [issues](https://github.com/josverl/mp-agents/issues) for bugs and questions.
-Include the client, operating system, `mpremote` version, and a minimal
+Include the client, operating system, relevant tool version, and a minimal
 reproduction; do not include credentials or sensitive device contents.
 
 For sensitive security reports, use GitHub's private vulnerability reporting

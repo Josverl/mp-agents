@@ -12,6 +12,12 @@
       "source": "./plugins/mpremote",
       "version": "0.1.1",
       "description": "Work with attached MicroPython boards using mpremote on Windows, Linux, WSL2, and Docker."
+    },
+    {
+      "name": "mpflash",
+      "source": "./plugins/mpflash",
+      "version": "0.1.0",
+      "description": "Identify boards, download firmware, and flash MicroPython with mpflash on Windows, Linux, macOS, WSL2, and compatible containers."
     }
   ]
 }
