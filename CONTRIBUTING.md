@@ -2,6 +2,8 @@
 
 Focus contributions on MicroPython workflows. Support multiple clients without
 duplicating shared skill content or excluding otherwise compatible tools.
+Prefer Python scripts over Node.js scripts for repository automation. Keep
+validation and synchronization dependency-free where practical.
 
 ## Add or change a plugin
 
@@ -18,25 +20,48 @@ duplicating shared skill content or excluding otherwise compatible tools.
 6. Update the plugin table in the repository README and run:
 
    ```sh
-   node scripts/validate.mjs --sync
-   node scripts/validate.mjs
+   python3 scripts/validate.py --sync
+   python3 scripts/validate.py
    ```
-
-For changes to the mpbuild serial-permission helper, also run on Linux:
-
-```sh
-python3 -B -m unittest discover -s scripts -p 'test_mpbuild_permissions.py' -v
-```
-
-These tests do not access devices or install rules.
-
-The sync command updates `.github/plugin/marketplace.json` and
-`.claude-plugin/marketplace.json` from the root catalog. Commit all three.
-Do not maintain different plugin lists per client.
 
 For released plugins, bump versions in both plugin manifests and the catalog
 together, and add a changelog entry. Keep the initial version while preparing
 an unreleased first release.
+
+## Shared serial-permission helper
+
+The canonical implementation is
+[`plugins/mpremote/skills/mpremote/scripts/setup_serial_permissions.py`](plugins/mpremote/skills/mpremote/scripts/setup_serial_permissions.py).
+Do not edit the bundled copies in mpflash or mpbuild. After editing the primary
+version, generate and validate all copies:
+
+```sh
+python3 scripts/validate.py --sync
+python3 scripts/validate.py
+python3 -B -m unittest discover -s test -p 'test_*.py' -v
+```
+
+Commit the primary script and both generated copies together. The ordinary
+validator never repairs drift: CI rejects missing files or any byte difference.
+The sync command also updates both marketplace catalog aliases. Runtime users
+need only their selected plugin; scripts never import from sibling installs.
+
+To run only the safety suite against the primary helper:
+
+```sh
+python3 -B -m unittest discover -s test -p 'test_serial_permissions.py' -v
+```
+
+These tests automatically skip on non-Linux systems. They do not access devices
+or install rules.
+Use Python 3.10 or newer; on Windows, substitute `python` for `python3`.
+
+Catalog aliases are generated from the root `marketplace.json`; commit all
+three catalogs and do not maintain different plugin lists per client.
+
+Keep existing rule contents, filenames, and group names compatible when moving
+or sharing the helper; its legacy `mpbuild` names are not a reason to reinstall
+host permissions.
 
 ## Validation and safety
 

@@ -6,7 +6,11 @@ import unittest
 from unittest.mock import patch
 
 
-script = Path(__file__).resolve().parents[1] / "plugins/mpbuild/skills/mpbuild/scripts/setup_serial_permissions.py"
+if sys.platform != "linux":
+    raise unittest.SkipTest("Serial permission tests require Linux")
+
+
+script = Path(__file__).resolve().parents[1] / "plugins/mpremote/skills/mpremote/scripts/setup_serial_permissions.py"
 spec = importlib.util.spec_from_file_location("setup_serial_permissions", script)
 if spec is None or spec.loader is None:
     raise RuntimeError("Cannot load serial permission helper")
