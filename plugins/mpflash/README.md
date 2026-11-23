@@ -92,14 +92,22 @@ need the intended board isolated from other devices because backend discovery
 can select a different board after a reset. Missing native dependencies or
 unsupported boards are reported rather than bypassed.
 
-Both manifests discover the same skill. There are no hooks, bundled executable
-helpers, or automatic hardware operations. Instructions were checked against
+The optional [serial permission helper](skills/mpflash/scripts/setup_serial_permissions.py)
+is generated from mpremote's canonical version and checked byte-for-byte in CI.
+Each plugin remains independently installable. See the
+[skill's one-time setup](skills/mpflash/SKILL.md#one-time-linuxwsl-serial-setup)
+for preview, approval, and batched installation. Existing host setup is reused;
+no rule/group renaming or repeated per-reset sudo is required. This helper
+handles serial tty access, not raw USB/DFU, probes, or mounted UF2 volumes.
+
+Both manifests discover the same skill. There are no hooks or automatic setup
+or hardware operations; the helper runs only when explicitly approved. Instructions were checked against
 the local mpflash CLI and backend sources.
 
 Validation:
 
-- `node scripts/validate.mjs --sync`: passed; all three catalogs synchronized.
-- `node scripts/validate.mjs`: passed; both marketplace plugins validated.
+- `python3 scripts/validate.py --sync`: passed; all three catalogs synchronized.
+- `python3 scripts/validate.py`: passed; all three plugins and generated helpers validated.
 - Installed mpflash 1.28.5: `--version` and help for the root command, `list`,
   `download`, `flash`, `list-probes`, and `pyocd-targets` passed using an isolated
   firmware directory, without opening devices. Newer backend guidance comes

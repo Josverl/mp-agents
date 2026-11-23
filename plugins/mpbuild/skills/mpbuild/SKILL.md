@@ -254,6 +254,11 @@ alternative flashing backend or permission bypass.
 
 ## One-time Linux/WSL serial permissions
 
+The bundled helper is generated from mpremote's canonical source and compared
+byte-for-byte in CI. Each plugin includes its own standalone copy; no sibling
+plugin installation or path is required. Preserve the existing legacy
+`mpbuild-serial-*` rule/group names to reuse previously installed permissions.
+
 Skip this section for builds alone, host targets, macOS, Windows flashing,
 or when the execution environment already provides persistent device access.
 On Linux/WSL, prepare permissions **before** any reset/flash so a returning

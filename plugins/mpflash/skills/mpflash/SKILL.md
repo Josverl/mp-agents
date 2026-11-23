@@ -229,6 +229,41 @@ administrator action; `--yes` does not grant permission for it.
 
 ## Host platforms and device access
 
+### One-time Linux/WSL serial setup
+
+For identified USB tty devices without persistent access, use the bundled
+[permission helper](scripts/setup_serial_permissions.py) before resets or
+flashing. It is generated from mpremote's canonical source and checked for
+byte equality in CI; installing mpremote separately is not required.
+Existing host permissions are shared by all serial tools, so skip setup if
+it already works.
+
+Set `SKILL_DIR` to this installed skill's directory, select a group the user
+already belongs to, and replace the example nodes with approved targets:
+
+```sh
+python3 "$SKILL_DIR/scripts/setup_serial_permissions.py" --group dialout --device /dev/ttyACM0
+sudo -A python3 "$SKILL_DIR/scripts/setup_serial_permissions.py" --install --group dialout --device /dev/ttyACM0
+```
+
+Run preview first; execute the installation only after approval of persistent
+VID/PID/serial-scoped rules. Repeat `--device` within the same invocation for
+additional approved devices, not one sudo call per device. The helper requires
+Linux/WSL, Python 3.9+, and active udev 247+, uses mode `0660`, and reloads once.
+If WSL restores an inaccessible numeric group, explicitly approve the preview's
+broader group access and append `--enroll-observed-group` to both commands.
+It can create/enroll that group in the same setup invocation; membership grants
+access to all nodes with that group ID. Start a new login/agent session, or use
+a finite approved `sg GROUP -c 'COMMAND'` test.
+
+Verify access after reconnect. Keep flashing non-root; no per-reset sudo,
+world-writable modes, or passwordless sudo. Preserve existing legacy
+`mpbuild-serial-*` names. This handles tty permissions only: raw USB/DFU,
+probes, UF2 mounts, Windows binding, and container mappings need their own
+backend-specific access and approval.
+
+### Platform-specific access
+
 - **Windows:** use the actual COM port or drive letter. For STM32 DFU, verify
   the bootloader device and its WinUSB/libusb-compatible driver. If a driver
   change is needed, ask the user to install it for that exact USB interface

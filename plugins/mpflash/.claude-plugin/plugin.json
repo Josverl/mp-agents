@@ -1,6 +1,6 @@
 {
   "name": "mpflash",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Identify boards, download firmware, and flash MicroPython with mpflash on Windows, Linux, macOS, WSL2, and compatible containers.",
   "author": {
     "name": "Josverl"

@@ -270,18 +270,25 @@ separated from shared instructions.
 
 ## Checks
 
-With Node.js 22 or later, run:
+With Python 3.10 or later, run (use `python` instead of `python3` on Windows):
 
 ```sh
-node scripts/validate.mjs
+python3 scripts/validate.py
+python3 -B -m unittest discover -s test -p 'test_*.py' -v
 ```
 
 The dependency-free check compares catalog aliases, verifies plugin metadata and
 versions, checks local source paths, and validates skill frontmatter and links.
+It also rejects missing or differing serial-permission helper copies: mpremote
+holds the canonical source, while mpflash and mpbuild bundle generated copies.
+Maintainers regenerate them and the catalog aliases with
+`python3 scripts/validate.py --sync`; ordinary validation never modifies files.
+See [shared-helper maintenance](CONTRIBUTING.md#shared-serial-permission-helper)
+for the Linux safety test command and compatibility requirements.
 [CI](.github/workflows/validate.yml) runs it on Windows and Linux. It makes no
 model calls, spends no AI credits, and accesses no devices.
 
-Initial local checks:
+Historical local checks (before the validator was migrated from Node to Python):
 
 - `node scripts/validate.mjs`: passed.
 - Portable manifest validation against the official Agent Plugins 1.0 JSON

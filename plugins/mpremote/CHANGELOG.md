@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+
+- Use dependency-free Python validation, helper synchronization, and integration
+  tests; CI no longer requires Node.js.
+- Own the canonical Linux/WSL serial-permission helper and document opt-in
+  one-time setup for device workflows.
+- Generate byte-identical bundled copies for mpflash and mpbuild with the
+  marketplace sync command; CI rejects drift and missing copies.
+- Preserve existing udev rule contents, filenames, and group names.
+
 ## 0.1.1
 
 - Clarify host and device paths when running code with a mounted folder.

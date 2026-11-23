@@ -104,6 +104,12 @@ After enrollment, start a new login/agent session, or run a finite scoped test
 using `sg GROUP -c 'COMMAND'`. Do not assume adding a group updates an already
 running agent's effective groups.
 
+This helper is a generated copy of mpremote's canonical source. CI rejects
+missing or differing copies; each plugin remains independently installable.
+Maintainers edit only mpremote's version and run
+`python3 scripts/validate.py --sync` to regenerate the bundled copies. Existing
+rule contents, filenames, and group names are intentionally unchanged.
+
 Containers execute source build scripts and mount the checkout writable.
 Review source and images first. Docker access is powerful; do not enable a
 daemon, change groups, install system packages, or use privileged containers
@@ -125,10 +131,10 @@ tests, and unsupported mpbuild ports or mpflash backends are reported explicitly
 On 2026-11-22, the skill's workflow was exercised in Ubuntu WSL2 with Docker
 Desktop Linux containers, mpbuild 1.0.0, mpflash 1.28.5, and mpremote 1.28.0.
 
-- `node scripts/validate.mjs --sync`: passed.
-- `node scripts/validate.mjs`: passed; three plugins and all catalog aliases.
+- `python3 scripts/validate.py --sync`: passed.
+- `python3 scripts/validate.py`: passed; three plugins, all catalog aliases, and generated helpers.
 - `git diff --check`: passed.
-- `python3 -B -m unittest discover -s scripts -p 'test_mpbuild_permissions.py' -v`:
+- `python3 -B -m unittest discover -s test -p 'test_serial_permissions.py' -v`:
   passed; five tests cover identity scoping, unsafe rule rejection, missing
   USB serials, idempotency/conflicts, and safe observed-group enrollment.
   The Linux CI job runs these tests without devices or privileged operations.

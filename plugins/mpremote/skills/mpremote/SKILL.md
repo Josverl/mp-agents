@@ -14,6 +14,55 @@ description: Use mpremote to work with attached MicroPython boards over serial o
 
 Opening raw REPL can interrupt the application even for a filesystem read. Some versions or configurations also soft-reset on the first action. Use `resume` immediately after `connect` if a soft reset must be avoided; it does not prevent interruption. Do not reset or replace boot files as a routine connectivity check. If the port is busy, ask the user to close serial monitors or other sessions using that board. For permission errors on Linux, check the device node's owner/group and the current user's groups; use the site's serial group or per-device udev rule rather than broad permissions or running `mpremote` as root.
 
+## One-time Linux/WSL serial permissions
+
+Skip setup when persistent access already works. Host permissions apply to
+mpremote, mpflash, and other serial tools; changing tools does not require
+installing the same rules again.
+
+Use the bundled [setup helper](scripts/setup_serial_permissions.py) only for
+identified, authorized USB tty devices on Linux/WSL with Python 3.9+ and an
+active udev 247+ daemon. It does not open serial ports. Set `SKILL_DIR` to
+this installed skill's directory and replace the example nodes/group:
+
+```sh
+python3 "$SKILL_DIR/scripts/setup_serial_permissions.py" --group dialout --device /dev/ttyACM0 --device /dev/ttyACM1
+```
+
+Preview first and obtain approval for the persistent rules. The selected group
+must already contain the invoking user. Batch all approved devices into one
+privileged installation:
+
+```sh
+sudo -A python3 "$SKILL_DIR/scripts/setup_serial_permissions.py" --install --group dialout --device /dev/ttyACM0 --device /dev/ttyACM1
+```
+
+The helper writes VID/PID/serial-scoped udev rules with mode `0660`, reloads
+once, and triggers only the selected tty nodes. Identical existing rules are
+reused; differing files and symlinks are refused. USB binding/forwarding,
+UF2 mounts, raw USB, probes, and container access remain separate concerns.
+Never use repeated per-reset `sudo chgrp`, root mpremote, world-writable modes,
+sudo keepalives, or passwordless sudo as substitutes.
+
+WSL can restore a foreign numeric group after reconnect. If the preview shows
+this, obtain explicit approval and add `--enroll-observed-group` to the preview
+and installation commands. The same sudo invocation can create a local group
+for that observed ID and enroll the user. This grants access to **all** nodes
+with that group ID, not only the listed boards; privileged/low system groups
+are refused. Start a new login/agent session afterwards, or use a finite,
+explicitly scoped `sg CONFIRMED_GROUP -c 'COMMAND'` test.
+
+Reconnect only the approved devices, re-identify their returning nodes, and
+verify normal-user read/write access before continuing. A changed USB identity
+needs a newly reviewed rule. Unsupported devices or absent udev require the
+site's approved alternative, not broader permissions. Removal of installed
+rules or memberships also needs approval and must target only the known setup.
+
+This plugin holds the canonical helper. mpflash and mpbuild bundle generated,
+CI-checked identical copies, so each plugin works independently. Existing
+`99-mpbuild-serial-*` rule filenames and `mpbuild-serial-*` group names are
+intentionally retained for compatibility; do not recreate them under new names.
+
 ## List, transfer, and remove files
 
 A leading `:` marks a device path for `fs cp`; the operand without it is local. Other `fs` subcommands operate on the device and also accept `:` for clarity. Check the destination before writing, create missing parent directories, and avoid overwriting existing host or device files unless requested. Copy important files to a new local path before replacing or removing them.

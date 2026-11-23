@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Generate and validate bundled helpers with Python rather than Node tooling.
+- Generate the bundled serial-permission helper from the canonical mpremote
+  source and reject drift in CI.
+- Run the shared permission tests against mpremote's canonical helper while
+  retaining existing permission setup behavior and host rule compatibility.
+
 ## 0.1.0
 
 - Generalize board discovery, effective manifests, configuration, USB-free

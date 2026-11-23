@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "mpbuild",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build custom MicroPython firmware with mpbuild containers on Linux, macOS, and WSL2, then hand off to mpflash for approved device flashing.",
   "author": {
     "name": "Josverl"

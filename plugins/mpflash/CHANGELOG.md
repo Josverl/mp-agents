@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Generate and validate bundled helpers with Python rather than Node tooling.
+- Bundle the serial-permission helper generated from mpremote and document
+  approved one-time Linux/WSL setup before reset or flashing.
+- Validate bundled helper equality in CI without requiring another plugin
+  installation or changing existing host permission rules.
+
 ## 0.1.0
 
 - Initial mpflash skill with portable and Claude-compatible plugin manifests.

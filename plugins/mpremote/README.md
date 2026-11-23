@@ -1,6 +1,6 @@
 # mpremote
 
-A skills-only plugin for **MicroPython** device workflows on Windows, Linux,
+A skill plugin for **MicroPython** device workflows on Windows, Linux,
 WSL2, and Docker. It uses the installed `mpremote`, with `uvx mpremote` as the
 fallback; it never builds `mpremote` from source.
 
@@ -17,6 +17,8 @@ fallback; it never builds `mpremote` from source.
 - List, bind, attach, detach, and unbind a selected Windows USB board with
   `usbipd-win` for WSL2 use.
 - Pass a Linux serial node into Docker when the Docker daemon can access it.
+- Prepare persistent Linux/WSL serial access with a reviewed one-time setup
+  helper instead of repeated per-reset sudo calls.
 
 ## Install
 
@@ -52,11 +54,44 @@ and code using a host mount may modify host files. ROMFS deployment replaces
 partition contents. Never select a board, reset it, deploy ROMFS, or remove a
 directory based on guesswork.
 
+## Persistent serial permissions
+
+The optional [helper](skills/mpremote/scripts/setup_serial_permissions.py) is
+the canonical source for all three plugins. mpflash and mpbuild contain
+generated, byte-identical copies, checked by CI; none needs another plugin
+installed at runtime. Edit only this primary version when maintaining it.
+
+See the [skill's setup instructions](skills/mpremote/SKILL.md#one-time-linuxwsl-serial-permissions).
+Preview is unprivileged. With approval, one `sudo -A` invocation installs
+device-specific udev rules for all selected USB tty devices. Optional observed
+numeric-group enrollment handles WSL reconnect overrides and requires explicit
+approval of its broader group access. The helper requires Linux/WSL, Python
+3.9+, and active udev 247+. It does not grant raw USB, probe, or container
+access through its tty rules.
+
+Setup is host-wide, not tied to mpremote: existing rules work for mpflash
+and other serial tools too. Start a new login/agent session after enrollment.
+Legacy `99-mpbuild-serial-*` rules and `mpbuild-serial-*` groups remain unchanged
+to preserve existing installations. No setup runs during plugin installation.
+
 ## Package and validation
 
 The root manifest targets Agent Plugins 1.0; the `.claude-plugin` manifest
 supports Claude's plugin format. Both discover the **same** skill directory.
-There are no hooks, bundled executable tools, or MCP servers.
+There are no hooks or MCP servers. The bundled Python setup helper runs only
+when explicitly selected and approved; device operations still use mpremote.
+
+Shared helper maintenance checks:
+
+```sh
+python3 scripts/validate.py --sync
+python3 scripts/validate.py
+python3 -B -m unittest discover -s test -p 'test_*.py' -v
+```
+
+The checks require Python 3.10+; on Windows use `python` instead of `python3`.
+The serial-helper safety tests automatically skip outside Linux. None of these checks opens a device,
+installs host rules, or invokes sudo.
 
 Structural checks do not prove GUI activation or USB connectivity. See the
 [compatibility table](../../README.md#compatibility) for validation scope.
